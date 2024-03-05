@@ -1,17 +1,20 @@
 import Navbar from "@/components/ui/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import PropagateLoader from "react-spinners/PropagateLoader";
 
 const CLIENT_ID = "f2ccc382c5fe4389ac12da5be3b4fe23";
 const CLIENT_SECRET = "acf648ddfe3d41b4b27d0fe868646367";
 
-
-interface Moods {
+// interface Moods {
+//   id: number;
+//   mood: string;
+//   img: string;
+//   imgAlt: string;
+// }
+interface SpotifyPlaylist {
   id: number;
-  mood: string;
-  img: string;
-  imgAlt: string;
+  spotifyId: string;
 }
 
 const moods = [
@@ -41,15 +44,15 @@ const moods = [
   },
   {
     id: 5,
-    mood: "relaxed",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyN-GmJJ1jTA7g_pQkzrzI3EWRS-_HcLffoA&usqp=CAU",
-    imgAlt: "relaxed",
+    mood: "chill",
+    img: "https://img.freepik.com/free-photo/young-hipster-company-friends-vacation-summer-cafe-drinking-mojito-cocktails-happy-positive-style-smiling-happy-two-women-man-having-fun-together-talking-flirt-romance-three_285396-357.jpg?t=st=1709563915~exp=1709567515~hmac=4b66424e3eaec76c91d64a545f5a89e8bea83a5a32ee59c288f71ee2daf258f7&w=1800",
+    imgAlt: "chill",
   },
   {
     id: 6,
-    mood: "seduction",
-    img: "https://m.media-amazon.com/images/I/3120rV0W0UL._UXNaN_FMjpg_QL85_.jpg",
-    imgAlt: "seduction",
+    mood: "coding",
+    img: "https://img.freepik.com/free-photo/programming-background-with-person-working-with-codes-computer_23-2150010125.jpg?t=st=1709564045~exp=1709567645~hmac=d961eeba166f31653691d44b40e4ffafee8bf65240a99f151659caee861f4fc1&w=1800",
+    imgAlt: "coding",
   },
   {
     id: 7,
@@ -58,19 +61,25 @@ const moods = [
     imgAlt: "inspired",
   },
 ];
-const updateMoodData = (id: number) => {
-  return () => {
-    console.log("Updating mood data for id:", id);
-  };
-};
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const[accessToken, setAccessToken]=useState();
+  const [accessToken, setAccessToken] = useState();
+  const [isLoading, setLoading] = useState(false);
+  const [selectedMood, setSelectedMood] = useState<number[]>([]);
+  const [playlistLink, setPlaylistLink] = useState("");
+  const [playlistID, setPlaylistID] = useState("1SMzluTXEyXFmzJRphyOvb");
 
-  const [plalistLink, setPlaylistLink] = useState("");
-
+  const spotifyPlaylists = [
+    { id: 1, spotifyId: "5BxqiXdL315dDipxbfKXdr" },
+    { id: 2, spotifyId: "6vAzi95cMQeK4iNv8ttf2y" },
+    { id: 3, spotifyId: "5xS3Gi0fA3Uo6RScucyct6" },
+    { id: 4, spotifyId: "37i9dQZF1DWWY64wDtewQt" },
+    { id: 5, spotifyId: "0n81ha8dSdYLDVc8VpCPsd" },
+    { id: 6, spotifyId: "1a7845Km1tXbRnbPx45584" },
+    { id: 7, spotifyId: "6X185BlQApNN7mjiFFhPdi" },
+  ];
 
   useEffect(() => {
     let authParameters = {
@@ -84,89 +93,160 @@ const HomePage: React.FC = () => {
         "&client_secret=" +
         CLIENT_SECRET,
     };
-  
+
     fetch("https://accounts.spotify.com/api/token", authParameters)
       .then((result) => result.json())
-      .then((data => setAccessToken(data.access_token)));
+      .then((data) => setAccessToken(data.access_token));
   }, []);
 
+  function getSpotifyIdsFromSelectedMoods(
+    selectedMood: number[],
+    spotifyPlaylists: SpotifyPlaylist[]
+  ): string[] {
+    const spotifyIds = selectedMood
+      .map(
+        (moodId) =>
+          spotifyPlaylists.find((playlist) => playlist.id === moodId)?.spotifyId
+      )
+      .filter((spotifyId): spotifyId is string=> spotifyId !== undefined); // Removeing undefined entries
 
+    return spotifyIds;
+  }
 
-
-  async function getPlaylist (){
-
-  
-  let searchParameters={
-      method:'GET',
-      headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + accessToken
-      }
-  };
-      let response = await fetch('https://api.spotify.com/v1/playlists/' + '5BxqiXdL315dDipxbfKXdr?si=ca1f991337364365' , searchParameters)
-      // .then(response => response.json())
-      // .then(data => { console.log(data)})
-      // console.log(response)
-
-      let json_response = await response.json()
-      // console.log(json_response)
-      let playlistID = json_response.id;
-      setPlaylistLink(`https://open.spotify.com/playlist/${playlistID}`)
-      window.open(`https://open.spotify.com/playlist/${playlistID}`, '_blank');
-      
-
-      // let playlist1 = response.data
-      
-      // console.log("The playlist is " + playlist1);
-      // // // Get request with Arist ID grab all the albums from that artist
-      // var albums = await fetch('https://api.spotify.com/v1/artists/' + artistID + '/albums' + '?include_groups=album&market=US&limit')
-      // .then(response => response.json())
-      // .then(data => {console.log(data)};
-      // // console.log(data);
-      // // });
+  async function getPlaylist(selectedMood: number[]) {
+    if (!selectedMood) {
+      console.log("Please selectt the mood first");
+      return;
     }
+    setLoading(true);
 
+    if (!accessToken) {
+      console.log("Access token is not available.");
+      setLoading(false);
+      return;
+    }
+    const spotifyIds = getSpotifyIdsFromSelectedMoods(
+      selectedMood,
+      spotifyPlaylists
+    );
 
+    for (const spotifyId of spotifyIds) {
+      let searchParameters = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+      };
 
-  const navigateToPage = (): void => {
-    navigate("/PlaylistPage");
+      let response = await fetch(
+        `https://api.spotify.com/v1/playlists/${spotifyId}`,
+        searchParameters
+      );
+
+      let json_response = await response.json();
+      setPlaylistID(json_response.id);
+      setPlaylistLink(`https://open.spotify.com/playlist/${playlistID}`);
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    console.log(playlistLink);
+  }, [playlistLink]);
+
+  const updateMoodData = (id: number) => {
+    if (selectedMood.includes(id)) {
+      setSelectedMood(selectedMood.filter((moodId) => moodId !== id));
+    } else {
+      setSelectedMood([...selectedMood, id]);
+    }
   };
+
+  useEffect(() => {
+    console.log("The Selected Moods are:" + selectedMood);
+  }, [selectedMood]);
 
   return (
     <>
-      <Navbar />
-      <div className="bg-white pb-40 mt-10">
-        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-0 lg:max-w-7xl lg:px-8">
-          <h2 className="sr-only">Moods</h2>
-
-          <div className="grid grid-cols-1 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-            {moods.map((mood) => (
-              <a key={mood.id} href={mood.img} className="group">
-                <div className=" w-64 h-40 overflow-hidden rounded-lg bg-gray-200">
-                  <img
-                    onClick={() => updateMoodData(mood.id)}
-                    src={mood.img}
-                    alt={mood.imgAlt}
-                    className="h-full w-full object-cover object-center group-hover:opacity-75"
-                  />
-                </div>
-                <h3 className="mt-4 text-sm text-gray-700">{mood.imgAlt}</h3>
-              </a>
-            ))}
+      {isLoading ? (
+        <>
+          <div
+            style={{
+              backgroundColor: "black",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100vh",
+            }}
+          >
+            <PropagateLoader
+              color={"green"}
+              loading={isLoading}
+              cssOverride={{ color: "green" }}
+              size={35}
+              aria-label="Loading..."
+            ></PropagateLoader>
           </div>
-        </div>
-      </div>
-      <div className="fixed inset-x-0 bottom-4 px-12">
-        <button
-          onClick={navigateToPage}
-          type="submit"
-          className=" w-full max-w-[calc(100%-100px)] m-12 items-center text-nowrap justify-center rounded-md border border-transparent bg-indigo-600 pl-5 pr-5 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Get The Playlist
-        </button>
+        </>
+      ) : (
+        <>
+          <Navbar />
+          <div className="flex w-full">
+            <div className=" static bg-white pb-5 mt-0 w-1/2">
+              <div className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-0 lg:max-w-7xl lg:px-8">
+                <h2 className="sr-only">Moods</h2>
 
-        <button onClick={getPlaylist} className='btn btn-dark'>get Happy Playlist</button>
-      </div>
+                <div className=" static grid grid-cols-1 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2">
+                  {moods.map((mood) => (
+                    <a
+                      key={mood.id}
+                      onClick={() => updateMoodData(mood.id)}
+                      className="group cursor-pointer"
+                    >
+                      <div
+                       className={`w-64 h-40 overflow-hidden rounded-lg bg-gray-200 ${
+                        selectedMood.includes(mood.id) ? "outline outline-green-500 outline-4 outline-offset-4" : ""
+                      }`}
+                      >
+                        <img
+                          tabIndex={0}
+                          onClick={() => updateMoodData(mood.id)}
+                          src={mood.img}
+                          alt={mood.imgAlt}
+                          className="h-full w-full object-cover object-center group-hover:opacity-75  "
+                        />
+                      </div>
+                      <h3 className="mt-4 text-sm text-gray-700">
+                        {mood.imgAlt}
+                      </h3>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <iframe
+              className="w-1/2 h-auto inline-block "
+              src={`https://open.spotify.com/embed/playlist/${playlistID}?utm_source=generator`}
+              width="100%"
+              height="100%"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            ></iframe>
+          </div>
+
+          <div className="flex px-12">
+            <button
+              onClick={() => getPlaylist(selectedMood)}
+              type="button"
+              className=" fixed left-0 bottom-0 m-12 items-center text-nowrap justify-center rounded-md border border-transparent bg-green-600 pl-5 pr-5 py-3 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              Get The Playlist
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 };
