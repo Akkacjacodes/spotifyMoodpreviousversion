@@ -108,16 +108,17 @@ const HomePage: React.FC = () => {
         (moodId) =>
           spotifyPlaylists.find((playlist) => playlist.id === moodId)?.spotifyId
       )
-      .filter((spotifyId): spotifyId is string=> spotifyId !== undefined); // Removeing undefined entries
+      .filter((spotifyId): spotifyId is string => spotifyId !== undefined); // Removeing undefined entries
 
     return spotifyIds;
   }
 
   async function getPlaylist(selectedMood: number[]) {
     if (!selectedMood) {
-      console.log("Please selectt the mood first");
+      console.log("Please select the mood first");
       return;
     }
+
     setLoading(true);
 
     if (!accessToken) {
@@ -192,12 +193,20 @@ const HomePage: React.FC = () => {
       ) : (
         <>
           <Navbar />
-          <div className="flex w-full">
-            <div className=" static bg-white pb-5 mt-0 w-1/2">
-              <div className="mx-auto max-w-2xl px-4 py-16 sm:px-0 sm:py-0 lg:max-w-7xl lg:px-8">
+          <div className="flex flex-col md:flex-row w-full ">
+            <iframe
+              className="md:w-1/2 md:h-auto h-24 inline-block md:order-2 m-0 p-0 border-8 border-white"
+              src={`https://open.spotify.com/embed/playlist/${playlistID}?utm_source=generator`}
+              width="100%"
+              height="100%"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            ></iframe>
+            <div className=" static bg-white pb-5 mt-0 md:w-1/2 md:order-1 border-8 border-white">
+              <div className="mx-auto max-w-2xl px-2 py-16 sm:px-0 sm:py-0 lg:max-w-7xl lg:px-0">
                 <h2 className="sr-only">Moods</h2>
 
-                <div className=" static grid grid-cols-1 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2">
+                <div className=" static grid grid-cols-2 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2  ">
                   {moods.map((mood) => (
                     <a
                       key={mood.id}
@@ -205,9 +214,11 @@ const HomePage: React.FC = () => {
                       className="group cursor-pointer"
                     >
                       <div
-                       className={`w-64 h-40 overflow-hidden rounded-lg bg-gray-200 ${
-                        selectedMood.includes(mood.id) ? "outline outline-green-500 outline-4 outline-offset-4" : ""
-                      }`}
+                        className={`w-64 md:w-40 h-40 lg:w-60 overflow-hidden rounded-lg bg-gray-200 ${
+                          selectedMood.includes(mood.id)
+                            ? "outline outline-green-500 outline-4 outline-offset-4"
+                            : ""
+                        }`}
                       >
                         <img
                           tabIndex={0}
@@ -225,22 +236,16 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <iframe
-              className="w-1/2 h-auto inline-block "
-              src={`https://open.spotify.com/embed/playlist/${playlistID}?utm_source=generator`}
-              width="100%"
-              height="100%"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-            ></iframe>
           </div>
 
           <div className="flex px-12">
             <button
               onClick={() => getPlaylist(selectedMood)}
               type="button"
-              className=" fixed left-0 bottom-0 m-12 items-center text-nowrap justify-center rounded-md border border-transparent bg-green-600 pl-5 pr-5 py-3 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              style={{
+                width: `calc(50% - 4rem)`, // Assuming a margin of 0.5rem on each side (left and right)
+              }}
+              className=" fixed left-1/2 md:left-0 sm:left-0 bottom-0 m-12 text-nowrap justify-center rounded-md border border-transparent bg-green-600 pl-5 pr-5 py-3 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             >
               Get The Playlist
             </button>
