@@ -1,5 +1,4 @@
 import Navbar from "@/components/ui/Navbar";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
@@ -63,7 +62,6 @@ const moods = [
 ];
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
 
   const [accessToken, setAccessToken] = useState();
   const [isLoading, setLoading] = useState(false);
