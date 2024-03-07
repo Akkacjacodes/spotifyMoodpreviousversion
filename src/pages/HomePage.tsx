@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
-const CLIENT_ID = "f2ccc382c5fe4389ac12da5be3b4fe23";
-const CLIENT_SECRET = "acf648ddfe3d41b4b27d0fe868646367";
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
 
 // interface Moods {
 //   id: number;
