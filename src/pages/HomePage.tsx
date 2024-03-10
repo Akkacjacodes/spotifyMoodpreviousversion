@@ -2,15 +2,6 @@ import Navbar from "@/components/ui/Navbar";
 import { useEffect, useState } from "react";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
-
-// interface Moods {
-//   id: number;
-//   mood: string;
-//   img: string;
-//   imgAlt: string;
-// }
 interface SpotifyPlaylist {
   id: number;
   spotifyId: string;
@@ -61,42 +52,39 @@ const moods = [
   },
 ];
 
-const HomePage: React.FC = () => {
+const spotifyPlaylists = [
+  { id: 1, spotifyId: "5BxqiXdL315dDipxbfKXdr" },
+  { id: 2, spotifyId: "6vAzi95cMQeK4iNv8ttf2y" },
+  { id: 3, spotifyId: "5xS3Gi0fA3Uo6RScucyct6" },
+  { id: 4, spotifyId: "37i9dQZF1DWWY64wDtewQt" },
+  { id: 5, spotifyId: "0n81ha8dSdYLDVc8VpCPsd" },
+  { id: 6, spotifyId: "1a7845Km1tXbRnbPx45584" },
+  { id: 7, spotifyId: "6X185BlQApNN7mjiFFhPdi" },
+];
 
+const HomePage: React.FC = () => {
   const [accessToken, setAccessToken] = useState();
   const [isLoading, setLoading] = useState(false);
   const [selectedMood, setSelectedMood] = useState<number[]>([]);
   const [playlistLink, setPlaylistLink] = useState("");
   const [playlistID, setPlaylistID] = useState("1SMzluTXEyXFmzJRphyOvb");
 
-  const spotifyPlaylists = [
-    { id: 1, spotifyId: "5BxqiXdL315dDipxbfKXdr" },
-    { id: 2, spotifyId: "6vAzi95cMQeK4iNv8ttf2y" },
-    { id: 3, spotifyId: "5xS3Gi0fA3Uo6RScucyct6" },
-    { id: 4, spotifyId: "37i9dQZF1DWWY64wDtewQt" },
-    { id: 5, spotifyId: "0n81ha8dSdYLDVc8VpCPsd" },
-    { id: 6, spotifyId: "1a7845Km1tXbRnbPx45584" },
-    { id: 7, spotifyId: "6X185BlQApNN7mjiFFhPdi" },
-  ];
-
+  //fetching autenticating token from backend
   useEffect(() => {
-    let authParameters = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body:
-        "grant_type=client_credentials&client_id=" +
-        CLIENT_ID +
-        "&client_secret=" +
-        CLIENT_SECRET,
-    };
-
-    fetch("https://accounts.spotify.com/api/token", authParameters)
-      .then((result) => result.json())
-      .then((data) => setAccessToken(data.access_token));
+    setLoading(true);
+    fetch("http://localhost:3000/authenticate")
+      .then((response) => response.json())
+      .then((data) => {
+        setAccessToken(data.accessToken);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching access token:", error);
+        setLoading(false);
+      });
   }, []);
 
+  
   function getSpotifyIdsFromSelectedMoods(
     selectedMood: number[],
     spotifyPlaylists: SpotifyPlaylist[]
