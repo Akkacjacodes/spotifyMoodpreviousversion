@@ -77,6 +77,7 @@ const HomePage: React.FC = () => {
       .then((data) => {
         setAccessToken(data.accessToken);
         setLoading(false);
+        console.log(data.accessToken)
       })
       .catch((error) => {
         console.error("Error fetching access token:", error);
