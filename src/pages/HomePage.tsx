@@ -63,85 +63,24 @@ const spotifyPlaylists = [
 ];
 
 const HomePage: React.FC = () => {
-  const [accessToken, setAccessToken] = useState();
   const [isLoading, setLoading] = useState(false);
   const [selectedMood, setSelectedMood] = useState<number[]>([]);
-  const [playlistLink, setPlaylistLink] = useState("");
-  const [playlistID, setPlaylistID] = useState("1SMzluTXEyXFmzJRphyOvb");
+  const [playlistIDs, setPlaylistIDs] = useState(["1SMzluTXEyXFmzJRphyOvb"]);
 
-  //fetching autenticating token from backend
-  useEffect(() => {
-    setLoading(true);
-    fetch("http://localhost:3000/authenticate")
-      .then((response) => response.json())
-      .then((data) => {
-        setAccessToken(data.accessToken);
-        setLoading(false);
-        console.log(data.accessToken)
-      })
-      .catch((error) => {
-        console.error("Error fetching access token:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  
-  function getSpotifyIdsFromSelectedMoods(
+  function getPlaylist(
     selectedMood: number[],
     spotifyPlaylists: SpotifyPlaylist[]
-  ): string[] {
+  ) {
+    setLoading(true)
     const spotifyIds = selectedMood
       .map(
         (moodId) =>
           spotifyPlaylists.find((playlist) => playlist.id === moodId)?.spotifyId
       )
       .filter((spotifyId): spotifyId is string => spotifyId !== undefined); // Removeing undefined entries
-
-    return spotifyIds;
+    setPlaylistIDs(spotifyIds);
+    setLoading(false)
   }
-
-  async function getPlaylist(selectedMood: number[]) {
-    if (!selectedMood) {
-      console.log("Please select the mood first");
-      return;
-    }
-
-    setLoading(true);
-
-    if (!accessToken) {
-      console.log("Access token is not available.");
-      setLoading(false);
-      return;
-    }
-    const spotifyIds = getSpotifyIdsFromSelectedMoods(
-      selectedMood,
-      spotifyPlaylists
-    );
-
-    for (const spotifyId of spotifyIds) {
-      let searchParameters = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + accessToken,
-        },
-      };
-
-      let response = await fetch(
-        `https://api.spotify.com/v1/playlists/${spotifyId}`,
-        searchParameters
-      );
-
-      let json_response = await response.json();
-      setPlaylistID(json_response.id);
-      setPlaylistLink(`https://open.spotify.com/playlist/${playlistID}`);
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    console.log(playlistLink);
-  }, [playlistLink]);
 
   const updateMoodData = (id: number) => {
     if (selectedMood.includes(id)) {
@@ -183,7 +122,7 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col md:flex-row w-full ">
             <iframe
               className="md:w-1/2 md:h-auto h-24 inline-block md:order-2 m-0 p-0 border-8 border-white"
-              src={`https://open.spotify.com/embed/playlist/${playlistID}?utm_source=generator`}
+              src={`https://open.spotify.com/embed/playlist/${playlistIDs}?utm_source=generator`}
               width="100%"
               height="100%"
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -227,7 +166,7 @@ const HomePage: React.FC = () => {
 
           <div className="flex px-12">
             <button
-              onClick={() => getPlaylist(selectedMood)}
+              onClick={() => getPlaylist(selectedMood,spotifyPlaylists)}
               type="button"
               style={{
                 width: `calc(50% - 4rem)`, // Assuming a margin of 0.5rem on each side (left and right)
