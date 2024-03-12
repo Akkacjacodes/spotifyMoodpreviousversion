@@ -2,10 +2,7 @@ import Navbar from "@/components/ui/Navbar";
 import { useEffect, useState } from "react";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
-interface SpotifyPlaylist {
-  id: number;
-  spotifyId: string;
-}
+
 
 const moods = [
   {
@@ -60,33 +57,40 @@ const spotifyPlaylists = [
   { id: 5, spotifyId: "0n81ha8dSdYLDVc8VpCPsd" },
   { id: 6, spotifyId: "1a7845Km1tXbRnbPx45584" },
   { id: 7, spotifyId: "6X185BlQApNN7mjiFFhPdi" },
+  { id: 100, spotifyId: "1SMzluTXEyXFmzJRphyOvb" },
 ];
 
 const HomePage: React.FC = () => {
   const [isLoading, setLoading] = useState(false);
-  const [selectedMood, setSelectedMood] = useState<number[]>([]);
+  const [selectedMood, setSelectedMood] = useState<number>();
   const [playlistIDs, setPlaylistIDs] = useState(["1SMzluTXEyXFmzJRphyOvb"]);
 
-  function getPlaylist(
-    selectedMood: number[],
-    spotifyPlaylists: SpotifyPlaylist[]
-  ) {
-    setLoading(true)
-    const spotifyIds = selectedMood
-      .map(
-        (moodId) =>
-          spotifyPlaylists.find((playlist) => playlist.id === moodId)?.spotifyId
-      )
-      .filter((spotifyId): spotifyId is string => spotifyId !== undefined); // Removeing undefined entries
-    setPlaylistIDs(spotifyIds);
-    setLoading(false)
+  function getPlaylist(selectedMood: number) {
+    setLoading(true);
+    let spotifyId = selectedMood
+      ? spotifyPlaylists.find((playlist) => playlist.id === selectedMood)
+          ?.spotifyId
+      : "1SMzluTXEyXFmzJRphyOvb";
+
+    //   .map(
+    //     (moodId) =>
+    //       spotifyPlaylists.find((playlist) => playlist.id === moodId)?.spotifyId
+    //   )
+    //   .filter((spotifyId): spotifyId is string => spotifyId !== undefined); // Removeing undefined entries
+    if (spotifyId) {
+      setPlaylistIDs([spotifyId]);
+    } else {
+      // Handle the case where there's no matching playlist or no mood selected
+      setPlaylistIDs([]);
+    }
+    setLoading(false);
   }
 
   const updateMoodData = (id: number) => {
-    if (selectedMood.includes(id)) {
-      setSelectedMood(selectedMood.filter((moodId) => moodId !== id));
+    if (selectedMood === id) {
+      setSelectedMood(100);
     } else {
-      setSelectedMood([...selectedMood, id]);
+      setSelectedMood(id);
     }
   };
 
@@ -141,7 +145,7 @@ const HomePage: React.FC = () => {
                     >
                       <div
                         className={`w-64 md:w-40 h-40 lg:w-60 overflow-hidden rounded-lg bg-gray-200 ${
-                          selectedMood.includes(mood.id)
+                          selectedMood === mood.id
                             ? "outline outline-green-500 outline-4 outline-offset-4"
                             : ""
                         }`}
@@ -166,7 +170,9 @@ const HomePage: React.FC = () => {
 
           <div className="flex px-12">
             <button
-              onClick={() => getPlaylist(selectedMood,spotifyPlaylists)}
+              onClick={() =>
+                selectedMood !== undefined && getPlaylist(selectedMood)
+              }
               type="button"
               style={{
                 width: `calc(50% - 4rem)`, // Assuming a margin of 0.5rem on each side (left and right)
