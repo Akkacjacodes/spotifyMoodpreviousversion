@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import { ChangeEvent,FormEvent, useState } from "react";
 import Navbar from "@/components/ui/Navbar";
 
 const FindSimilar = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
   
-  const handleInputChange = (event) => {
+  const handleInputChange = (event:ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.value) {
+        console.log('No input');
+      }
     setSearchQuery(event.target.value); 
   };
 
  
-  const onSubmit = (event) => {
+  const onSubmit = (event:FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log('Submitted with query:', searchQuery); 
+    console.log('Submitted with query:', searchQuery.trim()); 
   };
   return (
     <>
