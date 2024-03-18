@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
 
-
 const moods = [
   {
     id: 1,
@@ -187,5 +186,6 @@ const HomePage: React.FC = () => {
     </>
   );
 };
+
 
 export default HomePage;
