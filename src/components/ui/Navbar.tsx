@@ -7,7 +7,7 @@ import { Link, useLocation } from "react-router-dom";
 const navigation = [
   { name: "Moods", href: "/" },
   { name: "Find similar", href: "/findsimilar" },
-  { name: "New popular", href: "/newpopular" },
+  { name: "Now popular", href: "/newpopular" },
   { name: "Year filtered", href: "/yearfiltered" },
 ];
 

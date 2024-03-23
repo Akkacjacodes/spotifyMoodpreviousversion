@@ -135,7 +135,7 @@ const HomePage: React.FC = () => {
               <div className="mx-auto max-w-2xl px-2 py-16 sm:px-0 sm:py-0 lg:max-w-7xl lg:px-0">
                 <h2 className="sr-only">Moods</h2>
 
-                <div className=" static grid grid-cols-2 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2  ">
+                <div className=" static grid grid-cols-3 place-items-center gap-x-6 gap-y-6 sm:grid-cols-2  ">
                   {moods.map((mood) => (
                     <a
                       key={mood.id}
