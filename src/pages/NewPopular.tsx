@@ -21,7 +21,7 @@ const NewPopular = () => {
 
   async function getRequest() {
     try {
-      const response = await axios.get("http://localhost:3000/newpopular");
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/newpopular`);
       // 
       setData({
         message: response.data.message,
