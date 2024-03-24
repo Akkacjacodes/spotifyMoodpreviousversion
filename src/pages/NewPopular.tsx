@@ -23,7 +23,7 @@ const NewPopular = () => {
 
   async function getRequest() {
     try {
-      const response = await axios.get(`${baseURL}/newpopular`);
+      const response = await axios.get(`${baseURL}`);
       console.log(response)
 
       //
