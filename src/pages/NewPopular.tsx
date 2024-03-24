@@ -15,9 +15,9 @@ type DataState = {
   message: string;
   playlists: PlaylistItem[];
 };
-
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 const NewPopular = () => {
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
+  
   const [data, setData] = useState<DataState>({ message: "", playlists: [] });
   const [playlistId, setPlaylistId] = useState<string | null>(null);
 
