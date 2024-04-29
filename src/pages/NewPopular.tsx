@@ -1,5 +1,6 @@
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "../components/ui/Navbar";
 import axios from "axios";
+import React from "react";
 import { useEffect, useState } from "react";
 
 type PlaylistItem = {
