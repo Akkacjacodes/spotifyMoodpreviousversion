@@ -2,7 +2,6 @@ import Navbar from "@/components/ui/Navbar";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-
 type PlaylistItem = {
   description: string;
   images: { url: string }[];
@@ -16,17 +15,26 @@ type DataState = {
   playlists: PlaylistItem[];
 };
 const baseURL = import.meta.env.VITE_API_BASE_URL;
+console.log(baseURL);
+const yourAccessToken= import.meta.env.yourAccessToken;
+
 const NewPopular = () => {
-  
   const [data, setData] = useState<DataState>({ message: "", playlists: [] });
   const [playlistId, setPlaylistId] = useState<string | null>(null);
 
+
   async function getRequest() {
     try {
-      const response = await axios.get(`${baseURL}/newpopular`);
-      console.log(response)
+      const config = {
+        headers: {
+          "Authorization": "Bearer ${yourAccessToken}", // Replace 'your_access_token' with the actual token
+          "Custom-Header": "Hello", // Add any other headers here
+        },
+      };
 
-      //
+      const response = await axios.get(`${baseURL}/newpopular`, config);
+      console.log(response);
+
       setData({
         message: response.data.message,
         playlists: response.data.playlists.items,
@@ -34,7 +42,6 @@ const NewPopular = () => {
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching playlists:", error);
-
       setData({ message: "Failed to load playlists", playlists: [] });
     }
   }
