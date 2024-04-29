@@ -27,7 +27,7 @@ const NewPopular = () => {
     try {
       const config = {
         headers: {
-          "Authorization": "Bearer ${yourAccessToken}", // Replace 'your_access_token' with the actual token
+          "Authorization": `Bearer ${yourAccessToken}`, // Replace 'your_access_token' with the actual token
           "Custom-Header": "Hello", // Add any other headers here
         },
       };
