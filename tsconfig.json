@@ -2,9 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      // Setup path aliases
+      "@/*": ["./src/*"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,
@@ -26,6 +25,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["../src/**/*"],
+  "exclude": [
+    "node_modules", // Exclude the node_modules directory from compilation
+    "**/*.test.ts", // Exclude test files from compilation (if applicable)
+    "dist" // Exclude the output directory from re-compilation
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
